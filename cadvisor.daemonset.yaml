@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: cadvisor
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      name: cadvisor
+  template:
+    metadata:
+      labels:
+        name: cadvisor
+    spec:
+      containers:
+      - name: cadvisor
+        image: google/cadvisor:latest
+        ports:
+          - name: http 
+            protocol: TCP
+            containerPort: 8080
+        volumeMounts:
+        - name: rootfs
+          mountPath: /rootfs
+          readOnly: true
+        - name: sys 
+          mountPath: /sys
+          readOnly: true
+        - name: var-run
+          mountPath: /var/run
+        - name: docker
+          mountPath: var/lib/docker
+          readOnly: true
+      volumes:
+      - name: rootfs
+        hostPath:
+          path: /
+      - name: sys
+        hostPath:
+          path: /sys
+      - name: var-run
+        hostPath:
+          path: /var/run
+      - name: docker
+        hostPath:
+          path: /var/lib/docker
